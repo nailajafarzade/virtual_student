@@ -23,7 +23,7 @@ export function LessonGuidanceBanner({ guidance, onSwitchTopic }: LessonGuidance
                 borderRadius: 8,
                 padding: '0.75rem 1rem',
                 margin: '1rem 0',
-                display: 'flex',
+                display: 'flex', flexWrap: 'wrap',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 gap: '1rem',

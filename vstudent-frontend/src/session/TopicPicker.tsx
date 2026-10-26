@@ -23,7 +23,7 @@ export function TopicPicker({ onStart }: { onStart: (topicId: number) => Promise
     }, [auth]);
 
     async function handleStart() {
-        if (selectedId == null) return;
+        if (selectedId == null || starting) return;
         setStarting(true);
         setError(null);
         try {
@@ -41,16 +41,18 @@ export function TopicPicker({ onStart }: { onStart: (topicId: number) => Promise
         <div>
             <h2>Start a session</h2>
             {error && <p style={{ color: 'crimson' }}>{error}</p>}
-            <select value={selectedId ?? ''} onChange={(e) => setSelectedId(Number(e.target.value))}>
+            <div className="action-row">
+            <select aria-label="Lesson topic" value={selectedId ?? ''} onChange={(e) => setSelectedId(Number(e.target.value))}>
                 {topics.map((topic) => (
                     <option key={topic.id} value={topic.id}>
                         {topic.name}
                     </option>
                 ))}
             </select>
-            <button onClick={handleStart} disabled={starting || selectedId == null} style={{ marginLeft: '0.5rem' }}>
+            <button onClick={handleStart} disabled={starting || selectedId == null}>
                 {starting ? 'Starting...' : 'Start Session'}
             </button>
+            </div>
         </div>
     );
 }

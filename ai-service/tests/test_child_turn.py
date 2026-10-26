@@ -1,5 +1,6 @@
 import unittest
 from unittest import mock
+from fastapi import HTTPException
 
 from app.api.child_turn import ChildTurnRequest, child_turn
 from app.child_agent.llm_agent import _clean
@@ -67,18 +68,23 @@ class ChildTurnFlowTest(unittest.TestCase):
         prompt = gen.call_args.args[0]
         self.assertIn("too hard for a 5-to-6-year-old", prompt)
 
-    def test_failed_llm_returns_flagged_fallback(self):
+    def test_failed_llm_returns_error_instead_of_fixed_reply(self):
         err = LlmGenerationError("Ollama returned status 404: model not found")
-        resp, gen = _run("How many apples?", TurnOutcome.CORRECT, [err, err])
-        self.assertFalse(resp.validation_passed)
-        self.assertEqual(gen.call_count, 1)  # mövcud olmayan model üçün retry yoxdur (cavab None)
+        with self.assertRaises(HTTPException) as caught:
+            _run("How many apples?", TurnOutcome.CORRECT, [err, err])
+        self.assertEqual(caught.exception.status_code, 502)
 
-    def test_malformed_output_retried_then_flagged_fallback(self):
+    def test_malformed_output_returns_error_instead_of_fixed_reply(self):
         long_ramble = " ".join(["blah"] * 40)
-        resp, gen = _run("How many apples?", TurnOutcome.INCORRECT, ["*giggles*", long_ramble])
-        self.assertEqual(gen.call_count, 2)
-        self.assertIn("rejected", gen.call_args.args[0])  # retry düzəliş qeydləri ilə
-        self.assertFalse(resp.validation_passed)
+        with self.assertRaises(HTTPException) as caught:
+            _run("How many apples?", TurnOutcome.INCORRECT, ["*giggles*", long_ramble])
+        self.assertEqual(caught.exception.status_code, 502)
+
+    def test_disabled_llm_returns_service_unavailable(self):
+        with mock.patch("app.config.settings.llm_enabled", False):
+            with self.assertRaises(HTTPException) as caught:
+                child_turn(_request("Hi"))
+        self.assertEqual(caught.exception.status_code, 503)
 
     def test_request_without_recent_turns_still_accepted(self):
         req = ChildTurnRequest.model_validate({

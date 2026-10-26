@@ -57,7 +57,7 @@ export function SessionList({
                 <div
                     key={session.id}
                     style={{
-                        display: 'flex',
+                        display: 'flex', flexWrap: 'wrap',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         padding: '0.75rem 0',

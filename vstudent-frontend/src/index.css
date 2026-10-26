@@ -241,3 +241,78 @@ td, th { border-color: #efeaff !important; }
   .brand { left: 20px; }
   .mood-panel { position: static; }
 }
+
+/* Allow content to shrink inside grids and wrap without clipping the page. */
+:root { --muted: #70669b; --faint: #776c9f; }
+.shell { grid-template-columns: 230px minmax(0, 1fr); }
+.main, .panel, .card, .auth-card, .home-top > *, .two-col > *, .session-grid > *,
+.topic-head > *, .row > *, .topbar > * { min-width: 0; }
+.main, .auth-card { overflow-wrap: anywhere; }
+input, textarea, select { min-width: 0; max-width: 100%; min-height: 44px; }
+textarea { resize: vertical; }
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid #7760ce; outline-offset: 2px;
+}
+button { min-height: 44px; max-width: 100%; color: #49214f; }
+.play { width: 44px; height: 44px; flex: none; }
+.eye { min-width: 44px; }
+img, video, audio { max-width: 100%; }
+audio { width: 280px; }
+.bubble { min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.bubble audio { width: 100%; }
+.table-scroll { max-width: 100%; overflow-x: auto; margin-block: 12px; }
+.table-scroll table { min-width: 560px; }
+.metrics-table table { min-width: 0; }
+.table-scroll th, .table-scroll td { vertical-align: top; }
+.table-scroll td:first-child { overflow-wrap: anywhere; }
+.turn-form, .action-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.turn-form input { flex: 1 1 160px; }
+.row { flex-wrap: wrap; }
+.week { flex-wrap: wrap; }
+.goals { flex-wrap: wrap; }
+.goals > svg { flex: none; }
+.menu { max-width: calc(100vw - 32px); }
+.chip { color: #926000; }
+.nav-item.active { color: #b54135; }
+.btn-green, button[type='button'].btn-green { color: #237858; }
+
+@media (min-width: 901px) and (max-width: 1200px) {
+  .main { padding: 24px; }
+  .home-top, .two-col { grid-template-columns: minmax(0, 1fr); }
+  .session-grid { grid-template-columns: 240px minmax(0, 1fr); }
+  .hero { grid-template-columns: 180px minmax(0, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { flex-wrap: wrap; overflow: visible; gap: 4px; }
+  .nav-item { flex: 1 1 auto; justify-content: center; padding: 8px; gap: 6px; font-size: 0.95rem; }
+  .home-top, .two-col, .session-grid { grid-template-columns: minmax(0, 1fr); }
+  .login-page { padding-top: 150px; }
+  .auth-card { width: 100%; max-width: 500px; justify-self: center; }
+}
+
+@media (max-width: 480px) {
+  .main { padding: 16px 12px 32px; }
+  .panel, .card { padding: 18px 14px; border-radius: 24px; }
+  .panel .panel { padding: 14px 10px; }
+  .topbar h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.3rem; }
+  .top-right { width: 100%; gap: 6px; justify-content: flex-end; }
+  .chip { padding: 8px; font-size: 0.85rem; gap: 4px; }
+  .avatar-btn { flex: none; }
+  .hero { padding: 18px 16px 0; border-radius: 24px; }
+  .hero-text h2 { font-size: 1.65rem; }
+  .topics { grid-template-columns: minmax(0, 1fr); }
+  .brand { left: 16px; top: 24px; font-size: 1.6rem; gap: 10px; }
+  .brand-mark { flex: none; width: 44px; height: 44px; }
+  .login-page { padding: 145px 12px 80px; }
+  .auth-card { padding: 64px 18px 24px; border-radius: 28px; }
+  .auth-card h2 { font-size: 1.8rem; }
+  .input-wrap { padding: 6px 10px; gap: 8px; }
+  .input-wrap input { font-size: 1rem; }
+  .bubble { max-width: 85%; padding: 10px 12px; }
+  .chat-row { gap: 6px; }
+  .chat-row.child .bubble { max-width: calc(100% - 50px); }
+  .nav-item { flex-basis: calc(50% - 4px); }
+}

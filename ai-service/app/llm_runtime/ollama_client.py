@@ -34,6 +34,8 @@ def generate(
     }
     if system:
         payload["system"] = system
+    if settings.ollama_num_gpu is not None:
+        payload["options"]["num_gpu"] = settings.ollama_num_gpu
 
     try:
         response = requests.post(

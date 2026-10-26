@@ -174,7 +174,7 @@ export function CurriculumManager({ onBack }: { onBack: () => void }) {
                     />
                 </label>
                 {error && <p style={{ color: 'crimson' }}>{error}</p>}
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                     <button type="submit" disabled={saving}>
                         {saving ? 'Saving...' : 'Save'}
                     </button>
@@ -191,7 +191,7 @@ export function CurriculumManager({ onBack }: { onBack: () => void }) {
             <button onClick={onBack} style={{ marginBottom: '1rem' }}>
                 ← Back to sessions
             </button>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2 style={{ margin: 0 }}>Curriculum</h2>
                 <button onClick={startNew}>+ New topic</button>
             </div>
@@ -203,7 +203,7 @@ export function CurriculumManager({ onBack }: { onBack: () => void }) {
                 <div
                     key={topic.id}
                     style={{
-                        display: 'flex',
+                        display: 'flex', flexWrap: 'wrap',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         padding: '0.75rem 0',
@@ -216,7 +216,7 @@ export function CurriculumManager({ onBack }: { onBack: () => void }) {
                         <span style={{ fontSize: '0.75rem', color: '#666' }}>(difficulty {topic.difficultyLevel})</span>
                         <div style={{ fontSize: '0.85rem', color: '#666' }}>{topic.objective}</div>
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', whiteSpace: 'nowrap' }}>
                         <button onClick={() => startEdit(topic)}>Edit</button>
                         <button onClick={() => handleDelete(topic)} style={{ background: '#dc2626' }}>
                             Delete

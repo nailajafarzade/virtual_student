@@ -22,16 +22,18 @@ export function SessionReportView({ report, onBack }: { report: SessionReport; o
             )}
 
             <h3>Metrics</h3>
-            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                <tbody>
-                {Object.entries(report.metrics).map(([key, value]) => (
-                    <tr key={key} style={{ borderBottom: '1px solid #eee' }}>
-                        <td style={{ padding: '0.25rem 0.5rem 0.25rem 0', color: '#666' }}>{formatMetricKey(key)}</td>
-                        <td style={{ padding: '0.25rem 0' }}>{value}</td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+            <div className="table-scroll metrics-table" role="region" aria-label="Session metrics" tabIndex={0}>
+                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <tbody>
+                    {Object.entries(report.metrics).map(([key, value]) => (
+                        <tr key={key} style={{ borderBottom: '1px solid #eee' }}>
+                            <td style={{ padding: '0.25rem 0.5rem 0.25rem 0', color: '#666' }}>{formatMetricKey(key)}</td>
+                            <td style={{ padding: '0.25rem 0' }}>{value}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
 
             <button onClick={onBack} style={{ marginTop: '1rem' }}>
                 ← Back to sessions

@@ -104,23 +104,17 @@ export function SessionWorkspace() {
     async function handleSubmitText(text: string) {
         if (state.phase !== 'active') return;
         setError(null);
-        try {
-            const turn = await submitTextTurn(credentials, state.session.id, text);
-            setState((prev) => (prev.phase === 'active' ? { ...prev, turns: [...prev.turns, turn] } : prev));
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Could not submit turn.');
-        }
+        const sessionId = state.session.id;
+        const turn = await submitTextTurn(credentials, sessionId, text);
+        setState((prev) => (prev.phase === 'active' && prev.session.id === sessionId ? { ...prev, turns: [...prev.turns, turn] } : prev));
     }
 
     async function handleSubmitAudio(blob: Blob) {
         if (state.phase !== 'active') return;
         setError(null);
-        try {
-            const turn = await submitAudioTurn(credentials, state.session.id, blob);
-            setState((prev) => (prev.phase === 'active' ? { ...prev, turns: [...prev.turns, turn] } : prev));
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Could not submit audio turn.');
-        }
+        const sessionId = state.session.id;
+        const turn = await submitAudioTurn(credentials, sessionId, blob);
+        setState((prev) => (prev.phase === 'active' && prev.session.id === sessionId ? { ...prev, turns: [...prev.turns, turn] } : prev));
     }
 
     async function handleSwitchTopic(topicId: number) {

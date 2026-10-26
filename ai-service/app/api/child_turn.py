@@ -1,7 +1,7 @@
 import logging
 from typing import List, Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.child_agent.child_agent import produce_child_response
 from app.child_agent.models import ConversationTurn
@@ -9,6 +9,7 @@ from app.child_state_engine.engine import apply_outcome, decide_turn_outcome
 from app.child_state_engine.models import ChildState, TurnOutcome
 from app.common.camel_model import CamelModel
 from app.curriculum.models import CurriculumTopicDTO
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,8 @@ class ChildTurnResponse(CamelModel):
 
 @router.post("/internal/child-turn", response_model=ChildTurnResponse, response_model_by_alias=True)
 def child_turn(request: ChildTurnRequest) -> ChildTurnResponse:
+    if not settings.llm_enabled:
+        raise HTTPException(status_code=503, detail="AI responses are disabled. Enable the LLM service to continue.")
     current_state = request.current_state or ChildState()
     topic = request.curriculum_topic
 
@@ -46,9 +49,11 @@ def child_turn(request: ChildTurnRequest) -> ChildTurnResponse:
 
     if not validation_passed:
         logger.warning(
-            "Turn used fallback response (session=%s turn=%s outcome=%s)",
+            "AI response unavailable or rejected (session=%s turn=%s outcome=%s)",
             request.session_id, request.turn_sequence_no, outcome.value,
         )
+        # Do not send or persist a fixed reply as a successful AI interaction.
+        raise HTTPException(status_code=502, detail="The AI could not produce a valid response. Please try again.")
 
     return ChildTurnResponse(
         child_response_text=response_text,

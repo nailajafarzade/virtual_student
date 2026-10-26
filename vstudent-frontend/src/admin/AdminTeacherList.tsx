@@ -80,46 +80,48 @@ export function AdminTeacherList({ onBack, onViewTeacherProgress }: AdminTeacher
                 </div>
             )}
 
-            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.9rem' }}>
-                <thead>
-                <tr style={{ textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>
-                    <th style={{ padding: '0.4rem' }}>Name</th>
-                    <th style={{ padding: '0.4rem' }}>Role</th>
-                    <th style={{ padding: '0.4rem' }}>Sessions</th>
-                    <th style={{ padding: '0.4rem' }}>Completed</th>
-                    <th style={{ padding: '0.4rem' }}>Last active</th>
-                    <th style={{ padding: '0.4rem' }}></th>
-                </tr>
-                </thead>
-                <tbody>
-                {teachers.map((t) => (
-                    <tr key={t.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                        <td style={{ padding: '0.4rem' }}>
-                            {t.name}
-                            <div style={{ fontSize: '0.75rem', color: '#999' }}>{t.email}</div>
-                        </td>
-                        <td style={{ padding: '0.4rem' }}>{t.role}</td>
-                        <td style={{ padding: '0.4rem' }}>{t.totalSessions}</td>
-                        <td style={{ padding: '0.4rem' }}>{t.completedSessions}</td>
-                        <td style={{ padding: '0.4rem' }}>{formatDate(t.lastSessionAt)}</td>
-                        <td style={{ padding: '0.4rem', whiteSpace: 'nowrap' }}>
-                            <button onClick={() => onViewTeacherProgress(t.id, t.name)} disabled={t.completedSessions === 0}>
-                                View progress
-                            </button>
-                            <button
-                                onClick={() => handleChangeRole(t.id, t.name, t.role === 'ADMIN' ? 'TEACHER' : 'ADMIN')}
-                                style={{ marginLeft: '0.5rem' }}
-                            >
-                                {t.role === 'ADMIN' ? 'Demote' : 'Promote'}
-                            </button>
-                            <button onClick={() => handleResetPassword(t.id, t.name)} style={{ marginLeft: '0.5rem' }}>
-                                Reset password
-                            </button>
-                        </td>
+            <div className="table-scroll" role="region" aria-label="Teachers" tabIndex={0}>
+                <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.9rem' }}>
+                    <thead>
+                    <tr style={{ textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>
+                        <th style={{ padding: '0.4rem' }}>Name</th>
+                        <th style={{ padding: '0.4rem' }}>Role</th>
+                        <th style={{ padding: '0.4rem' }}>Sessions</th>
+                        <th style={{ padding: '0.4rem' }}>Completed</th>
+                        <th style={{ padding: '0.4rem' }}>Last active</th>
+                        <th style={{ padding: '0.4rem' }}></th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {teachers.map((t) => (
+                        <tr key={t.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                            <td style={{ padding: '0.4rem' }}>
+                                {t.name}
+                                <div style={{ fontSize: '0.75rem', color: '#999' }}>{t.email}</div>
+                            </td>
+                            <td style={{ padding: '0.4rem' }}>{t.role}</td>
+                            <td style={{ padding: '0.4rem' }}>{t.totalSessions}</td>
+                            <td style={{ padding: '0.4rem' }}>{t.completedSessions}</td>
+                            <td style={{ padding: '0.4rem' }}>{formatDate(t.lastSessionAt)}</td>
+                            <td style={{ padding: '0.4rem', whiteSpace: 'nowrap' }}>
+                                <button onClick={() => onViewTeacherProgress(t.id, t.name)} disabled={t.completedSessions === 0}>
+                                    View progress
+                                </button>
+                                <button
+                                    onClick={() => handleChangeRole(t.id, t.name, t.role === 'ADMIN' ? 'TEACHER' : 'ADMIN')}
+                                    style={{ marginLeft: '0.5rem' }}
+                                >
+                                    {t.role === 'ADMIN' ? 'Demote' : 'Promote'}
+                                </button>
+                                <button onClick={() => handleResetPassword(t.id, t.name)} style={{ marginLeft: '0.5rem' }}>
+                                    Reset password
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

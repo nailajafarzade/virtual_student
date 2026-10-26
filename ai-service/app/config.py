@@ -1,10 +1,13 @@
 import os
+from typing import Optional
 
 
 class Settings:
     llm_enabled: bool = os.environ.get("LLM_ENABLED", "true").lower() == "true"
     ollama_base_url: str = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
     ollama_model: str = os.environ.get("OLLAMA_MODEL", "llama3.2:3b")
+    # Unset uses Ollama's automatic GPU selection; 0 forces CPU inference.
+    ollama_num_gpu: Optional[int] = int(os.environ["OLLAMA_NUM_GPU"]) if "OLLAMA_NUM_GPU" in os.environ else None
     ollama_timeout_seconds: float = float(os.environ.get("OLLAMA_TIMEOUT_SECONDS", "30"))
     llm_max_tokens: int = int(os.environ.get("LLM_MAX_TOKENS", "60"))
 

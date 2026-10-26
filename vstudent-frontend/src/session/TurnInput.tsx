@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { useAudioRecorder } from './useAudioRecorder';
 
 interface TurnInputProps {
@@ -9,50 +9,61 @@ interface TurnInputProps {
 export function TurnInput({ onSubmitText, onSubmitAudio }: TurnInputProps) {
     const [text, setText] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const pending = useRef(false);
+    const [error, setError] = useState<string | null>(null);
     const recorder = useAudioRecorder();
 
     async function handleTextSubmit(e: FormEvent) {
         e.preventDefault();
-        if (!text.trim()) return;
+        if (!text.trim() || pending.current || recorder.status === 'recording') return;
+        pending.current = true;
+        setError(null);
         setSubmitting(true);
         try {
             await onSubmitText(text.trim());
             setText('');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Your message could not be sent. Please try again.');
         } finally {
+            pending.current = false;
             setSubmitting(false);
         }
     }
 
     async function handleRecordToggle() {
-        if (recorder.status === 'recording') {
-            const blob = await recorder.stop();
-            if (blob) {
-                setSubmitting(true);
-                try {
-                    await onSubmitAudio(blob);
-                } finally {
-                    setSubmitting(false);
-                }
+        if (pending.current) return;
+        pending.current = true;
+        setSubmitting(true);
+        setError(null);
+        try {
+            if (recorder.status === 'recording') {
+                const blob = await recorder.stop();
+                if (blob) await onSubmitAudio(blob);
+            } else {
+                await recorder.start();
             }
-        } else {
-            await recorder.start();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Your recording could not be sent. Please record again.');
+        } finally {
+            pending.current = false;
+            setSubmitting(false);
         }
     }
 
     const busy = submitting;
 
     return (
-        <div style={{ marginTop: '1rem' }}>
-            <form onSubmit={handleTextSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ marginTop: '1rem' }} aria-busy={busy}>
+            <form className="turn-form" onSubmit={handleTextSubmit}>
                 <input
+                    aria-label="Message to Lumi"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Say something to the child..."
                     disabled={busy || recorder.status === 'recording'}
-                    style={{ flex: 1 }}
                 />
                 <button type="submit" disabled={busy || !text.trim() || recorder.status === 'recording'}>
-                    Send
+                    {busy ? 'Please wait...' : 'Send'}
                 </button>
             </form>
             <div style={{ marginTop: '0.5rem' }}>
@@ -66,7 +77,8 @@ export function TurnInput({ onSubmitText, onSubmitAudio }: TurnInputProps) {
                 </button>
                 {recorder.error && <p style={{ color: 'crimson', fontSize: '0.85rem' }}>{recorder.error}</p>}
             </div>
-            {submitting && <p style={{ color: '#666', fontSize: '0.85rem' }}>Waiting for the child's response...</p>}
+            {error && <p className="form-error" role="alert">{error}</p>}
+            {submitting && <p role="status" style={{ color: '#666', fontSize: '0.85rem' }}>Waiting for the child's response...</p>}
         </div>
     );
 }

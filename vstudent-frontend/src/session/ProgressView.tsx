@@ -79,28 +79,30 @@ export function ProgressView({ onBack, teacherId, teacherName }: ProgressViewPro
                     {progress.sessions.length > 0 && (
                         <>
                             <h3>Session history</h3>
-                            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.9rem' }}>
-                                <thead>
-                                <tr style={{ textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>
-                                    <th style={{ padding: '0.4rem' }}>Date</th>
-                                    <th style={{ padding: '0.4rem' }}>Topic</th>
-                                    <th style={{ padding: '0.4rem' }}>Turns</th>
-                                    <th style={{ padding: '0.4rem' }}>Encouragement</th>
-                                    <th style={{ padding: '0.4rem' }}>Open Qs</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {progress.sessions.map((s) => (
-                                    <tr key={s.sessionId} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                        <td style={{ padding: '0.4rem' }}>{formatDate(s.startedAt)}</td>
-                                        <td style={{ padding: '0.4rem' }}>{s.curriculumTopicName}</td>
-                                        <td style={{ padding: '0.4rem' }}>{s.totalTurns}</td>
-                                        <td style={{ padding: '0.4rem' }}>{pct(s.encouragementRate)}</td>
-                                        <td style={{ padding: '0.4rem' }}>{pct(s.openQuestionRatio)}</td>
+                            <div className="table-scroll" role="region" aria-label="Session history" tabIndex={0}>
+                                <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.9rem' }}>
+                                    <thead>
+                                    <tr style={{ textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>
+                                        <th style={{ padding: '0.4rem' }}>Date</th>
+                                        <th style={{ padding: '0.4rem' }}>Topic</th>
+                                        <th style={{ padding: '0.4rem' }}>Turns</th>
+                                        <th style={{ padding: '0.4rem' }}>Encouragement</th>
+                                        <th style={{ padding: '0.4rem' }}>Open Qs</th>
                                     </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {progress.sessions.map((s) => (
+                                        <tr key={s.sessionId} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                                            <td style={{ padding: '0.4rem' }}>{formatDate(s.startedAt)}</td>
+                                            <td style={{ padding: '0.4rem' }}>{s.curriculumTopicName}</td>
+                                            <td style={{ padding: '0.4rem' }}>{s.totalTurns}</td>
+                                            <td style={{ padding: '0.4rem' }}>{pct(s.encouragementRate)}</td>
+                                            <td style={{ padding: '0.4rem' }}>{pct(s.openQuestionRatio)}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </>
                     )}
                 </>

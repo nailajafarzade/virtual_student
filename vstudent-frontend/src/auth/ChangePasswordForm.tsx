@@ -57,7 +57,7 @@ export function ChangePasswordForm({ onClose }: { onClose: () => void }) {
                 />
             </label>
             {error && <p style={{ color: 'crimson' }}>{error}</p>}
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
                 <button type="submit" disabled={submitting}>
                     {submitting ? 'Saving...' : 'Change password'}
                 </button>

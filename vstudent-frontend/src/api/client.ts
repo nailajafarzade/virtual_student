@@ -12,7 +12,7 @@ import type {
     Turn,
 } from './types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080').replace(/\/+$/, '');
 
 export class ApiError extends Error {
     constructor(public status: number, message: string) {
@@ -34,18 +34,34 @@ async function request<T>(
         headers.set('Authorization', authHeader(credentials));
     }
 
-    const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+    let response: Response;
+    try {
+        response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+    } catch {
+        throw new ApiError(0, 'Cannot connect to Virtual Student. Check your connection and try again. If this continues, contact support.');
+    }
 
     if (!response.ok) {
         const body = await response.text();
         let message = body;
         try {
             const parsed = JSON.parse(body);
-            message = parsed.error ?? parsed.message ?? body;
+            const detail = parsed.error ?? parsed.message ?? parsed.detail;
+            message = typeof detail === 'string' ? detail : '';
         } catch {
             // body JSON deyil — xam mətnlə davam et
         }
-        throw new ApiError(response.status, message || `Request failed: ${response.status}`);
+        const fallback = response.status === 401
+            ? 'Your sign-in details are no longer valid. Please sign in again.'
+            : response.status === 403
+                ? 'You do not have permission to perform this action.'
+                : 'The request could not be completed. Please try again.';
+        if ([502, 503, 504].includes(response.status)) {
+            message = 'Lumi could not respond because the AI service is unavailable or took too long. Please try again shortly. If this continues, contact support.';
+        } else if (response.status >= 500 || !response.headers.get('content-type')?.includes('application/json')) {
+            message = fallback;
+        }
+        throw new ApiError(response.status, message || fallback);
     }
 
     const contentType = response.headers.get('content-type') ?? '';
