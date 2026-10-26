@@ -1,9 +1,10 @@
 import logging
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter
 
 from app.child_agent.child_agent import produce_child_response
+from app.child_agent.models import ConversationTurn
 from app.child_state_engine.engine import apply_outcome, decide_turn_outcome
 from app.child_state_engine.models import ChildState, TurnOutcome
 from app.common.camel_model import CamelModel
@@ -20,6 +21,8 @@ class ChildTurnRequest(CamelModel):
     teacher_utterance: str
     curriculum_topic: CurriculumTopicDTO
     current_state: Optional[ChildState] = None
+    # Əvvəlki növbələr (köhnədən yeniyə). Göndərilməsə, kontekstsiz işləyir.
+    recent_turns: List[ConversationTurn] = []
 
 
 class ChildTurnResponse(CamelModel):
@@ -38,7 +41,7 @@ def child_turn(request: ChildTurnRequest) -> ChildTurnResponse:
     updated_state = apply_outcome(current_state, topic.id, outcome)
 
     response_text, validation_passed = produce_child_response(
-        outcome, updated_state, topic, request.teacher_utterance
+        outcome, updated_state, topic, request.teacher_utterance, request.recent_turns
     )
 
     if not validation_passed:

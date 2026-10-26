@@ -1,48 +1,46 @@
 import type { ChildStateResponse } from '../api/types';
+import { Lumi } from '../ui/Lumi';
+import { MOODS, normalizeMood } from '../ui/moods';
 
-const EMOTION_EMOJI: Record<string, string> = {
-    NEUTRAL: '😐',
-    CONFIDENT: '😊',
-    CURIOUS: '🤔',
-    SHY: '😳',
-    FRUSTRATED: '😤',
-    TIRED: '😴',
-};
-
-function Bar({ label, value }: { label: string; value: number }) {
+function Bar({ label, value, color }: { label: string; value: number; color: string }) {
     const pct = Math.round(value * 100);
     return (
-        <div style={{ marginBottom: '0.4rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+        <div className="bar">
+            <div className="bar-top">
                 <span>{label}</span>
                 <span>{pct}%</span>
             </div>
-            <div style={{ background: '#e5e7eb', borderRadius: 4, height: 6 }}>
-                <div style={{ width: `${pct}%`, background: '#2563eb', height: 6, borderRadius: 4 }} />
+            <div className="bar-track">
+                <div className="bar-fill" style={{ width: `${pct}%`, background: color }} />
             </div>
         </div>
     );
 }
 
 export function ChildStateDisplay({ state }: { state: ChildStateResponse | null }) {
-    if (!state) {
-        return <p style={{ color: '#666' }}>No turns yet.</p>;
-    }
+    const mood = normalizeMood(state?.emotionalState);
+    const meta = MOODS[mood];
 
     return (
-        <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: '1rem' }}>
-            <p style={{ marginTop: 0 }}>
-                {EMOTION_EMOJI[state.emotionalState] ?? ''} <strong>{state.emotionalState}</strong>
-                {' · turn '}
-                {state.turnCount}
-            </p>
-            <Bar label="Attention" value={state.attention} />
-            <Bar label="Engagement" value={state.engagement} />
-            <Bar label="Confidence" value={state.confidence} />
-            <Bar label="Motivation" value={state.motivation} />
-            <Bar label="Curiosity" value={state.curiosity} />
-            <Bar label="Frustration" value={state.frustration} />
-            <Bar label="Fatigue" value={state.fatigue} />
+        <div className="card mood-panel">
+            <div className="mood-stage" style={{ background: meta.bg }}>
+                <span className="mood-name" style={{ color: meta.fg }}>{state ? meta.label : 'Waiting for you'}</span>
+                <Lumi mood={mood} size={190} body label={`Lumi looks ${meta.label.toLowerCase()}`} />
+            </div>
+            {!state ? (
+                <p style={{ color: 'var(--muted)', margin: 0 }}>No turns yet. Say hello to Lumi.</p>
+            ) : (
+                <>
+                    <p style={{ margin: '0 0 10px', color: 'var(--muted)', fontSize: '0.85rem' }}>Turn {state.turnCount}</p>
+                    <Bar label="Attention" value={state.attention} color="#6fb4ff" />
+                    <Bar label="Engagement" value={state.engagement} color="#9b7bff" />
+                    <Bar label="Confidence" value={state.confidence} color="#5fd3a8" />
+                    <Bar label="Motivation" value={state.motivation} color="#ffc933" />
+                    <Bar label="Curiosity" value={state.curiosity} color="#ff9aa2" />
+                    <Bar label="Frustration" value={state.frustration} color="#ff6b5a" />
+                    <Bar label="Fatigue" value={state.fatigue} color="#a39bcb" />
+                </>
+            )}
         </div>
     );
 }

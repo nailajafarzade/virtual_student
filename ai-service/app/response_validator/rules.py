@@ -1,3 +1,4 @@
+import re
 from typing import Callable, List, Optional
 
 from app.child_state_engine.models import ChildState, EmotionalState, TurnOutcome
@@ -38,12 +39,21 @@ def rule_forbidden_content(text: str, outcome: TurnOutcome, topic: CurriculumTop
     return None
 
 
+def _contains_phrase(text: str, phrase: str) -> bool:
+    # Söz sərhədi ilə: "5" "15"-in içində, "one" "someone"-un içində tapılmamalıdır.
+    return re.search(rf"(?<!\w){re.escape(phrase.lower())}(?!\w)", text.lower()) is not None
+
+
 def rule_answer_leak(text: str, outcome: TurnOutcome, topic: CurriculumTopicDTO, state: ChildState) -> Optional[str]:
     if outcome not in (TurnOutcome.INCORRECT, TurnOutcome.DISTRACTED):
         return None
-    lowered = text.lower()
     for answer in topic.acceptable_answers:
-        if answer.lower() in lowered:
+        # Kurikulumun öz yanlış cavab nümunəsində işlənən cavab (məs. "square") sızma sayılmır.
+        if outcome == TurnOutcome.INCORRECT and any(
+            _contains_phrase(m, answer) for m in topic.common_misconceptions
+        ):
+            continue
+        if _contains_phrase(text, answer):
             return f"Outcome is {outcome.value} but response states the acceptable answer '{answer}'."
     return None
 

@@ -37,6 +37,8 @@ import java.util.NoSuchElementException;
 public class TurnService {
 
     private static final Logger log = LoggerFactory.getLogger(TurnService.class);
+    // AI xidməti follow-up suallarını başa düşsün deyə göndərilən son növbələrin sayı.
+    private static final int RECENT_TURNS_FOR_CONTEXT = 4;
 
     private final SessionService sessionService;
     private final TurnRepository turnRepository;
@@ -146,7 +148,8 @@ public class TurnService {
         );
 
         ChildTurnResponseDto aiResponse = aiServiceClient.submitChildTurn(
-                new ChildTurnRequestDto(sessionId, nextSequenceNo, teacherUtterance, topicDto, currentStateDto)
+                new ChildTurnRequestDto(sessionId, nextSequenceNo, teacherUtterance, topicDto, currentStateDto,
+                        recentTurns(existingTurns))
         );
 
         if (Boolean.FALSE.equals(aiResponse.validationPassed())) {
@@ -172,6 +175,13 @@ public class TurnService {
         LessonEngineService.LessonGuidance guidance = lessonEngineService.getGuidance(topic, stateSnapshot);
 
         return new TurnWithState(turn, stateSnapshot, savedSignals, guidance);
+    }
+
+    private static List<ChildTurnRequestDto.ConversationTurnDto> recentTurns(List<Turn> existingTurns) {
+        int from = Math.max(0, existingTurns.size() - RECENT_TURNS_FOR_CONTEXT);
+        return existingTurns.subList(from, existingTurns.size()).stream()
+                .map(t -> new ChildTurnRequestDto.ConversationTurnDto(t.getTeacherUtteranceText(), t.getChildResponseText()))
+                .toList();
     }
 
     private List<TeacherSignalDto> tryAnalyzeTeacherTurn(String teacherUtterance, String previousOutcome,

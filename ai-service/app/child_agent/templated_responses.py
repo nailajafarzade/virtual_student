@@ -14,7 +14,7 @@ _DISTRACTED_PHRASES = [
 ]
 
 _FALLBACK_RESPONSES = {
-    TurnOutcome.CORRECT: "I think that's right.",
+    TurnOutcome.CORRECT: "Um... I think I know this one.",
     TurnOutcome.INCORRECT: "Hmm, I'm not sure.",
     TurnOutcome.NEEDS_CLARIFICATION: "Can you say that again?",
     TurnOutcome.DISTRACTED: "...",
